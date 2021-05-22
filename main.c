@@ -29,6 +29,7 @@ int main() {
 
 void initializeTextEditor(List *textEditor) {
     textEditor -> firstRow = NULL;
+    textEditor -> currentRow = NULL;
     textEditor -> lastRow = NULL;
     textEditor -> quantRows = 0;
     textEditor -> flagInsertMode = 0;
