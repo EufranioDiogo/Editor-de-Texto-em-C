@@ -12,6 +12,7 @@ typedef struct node {
 
 typedef struct list {
     Row *firstRow;
+    Row *currentRow;
     Row *lastRow;
     int quantRows;
     int currentLine;
