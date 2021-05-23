@@ -5,9 +5,9 @@ typedef struct node {
     int startCharCollumn;
     int endCharCollumn;
     char character[TOTAL_CHARACTER_PER_LINE];
-    int currentLine;
-    struct node *previousLine;
-    struct node *nextLine;
+    int flagCurrentLine;
+    struct node *previousRow;
+    struct node *nextRow;
 } Row;
 
 typedef struct list {
