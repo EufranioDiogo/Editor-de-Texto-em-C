@@ -3,12 +3,14 @@
 #include "tda.h"
 
 void initializeTextEditor(List *textEditor);
-int checkComand(char *textLine);
+int isComand(char *textLine);
 void addNewLine(List *textEditor, char *textLine);
 void copyTextToNewLine(Row *newRow, char *textLine);
 void setUpRow(Row *newRow);
 int getQuantCharacter(char *textLine);
 void updateRowsIDs(Row *row);
+int checkCommand(int startIndexOfCommand, char *textLine);
+void takeCommand(int starIndexOfCommand, char *textLine, char *command);
 
 
 int main() {
@@ -19,12 +21,14 @@ int main() {
     while(1 == 1) {
         fgets(textLine, sizeof(textLine), stdin);
 
-        int isCommandPresent = checkComand(textLine);
+        int isCommand = isComand(textLine);
 
-        if (isCommandPresent == 0) {
+        if (isCommand == 0) {
             addNewLine(textEditor, textLine);
         } else {
+            int startCommandIndex = isCommand;
 
+            checkCommand(startCommandIndex, textLine);
         }
     }
 }
@@ -39,7 +43,7 @@ void initializeTextEditor(List *textEditor) {
     textEditor -> currentLine = 0;
 }
 
-int checkComand(char *textLine) {
+int isComand(char *textLine) {
     int i = 0;
     int dollarSignalFound = 0;
 
@@ -54,7 +58,7 @@ int checkComand(char *textLine) {
     if (dollarSignalFound == 0) {
         return 0;
     }
-    return 1;
+    return i;
 }
 
 void addNewLine(List *textEditor, char *textLine) {
@@ -130,4 +134,24 @@ void updateRowsIDs(Row *row) {
         actualRow -> idLine = actualRow -> previousRow -> idLine + 1;
         actualRow = actualRow -> nextRow;
     }
+}
+
+int checkCommand(int startIndexOfCommand, char *textLine) {
+    char command[20];
+
+    takeCommand(startIndexOfCommand, textLine, command);
+
+    
+}
+
+void takeCommand(int startIndexOfCommand, char *textLine, char *command) {
+    int i = startIndexOfCommand + 1;
+    int j = 0;
+
+    while(*(textLine + i) != '\0' && *(textLine + i) != ' ') {
+        command[j] = *(textLine + i);
+        i++;
+        j++;
+    }
+    command[j] = '\0';
 }
