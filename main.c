@@ -17,7 +17,9 @@ void changeCurrentLine(List *textEditor, char *command);
 void getUltimoID(List *textEditor);
 void printLines(List *textEditor, char *command);
 void removeRows(List *textEditor, char *command);
-
+int getTwoParametersOfCommand(char *command, int *firstArgument, int *secondArgument);
+void printRow(Row *row);
+int contains(char *string, char *subString);
 
 int main() {
     List *textEditor = (List *)(malloc(sizeof(List)));
@@ -32,39 +34,38 @@ int main() {
         if (isCommand != -1) {
             int startCommandIndex = isCommand;
 
+            char text[TOTAL_CHARACTER_PER_LINE];
             int commandCode = checkCommand(startCommandIndex, commandLine);
             printf("\nCommand code: %d\n", commandCode);
-
+            
             switch (commandCode) {
-                case 1: // Inserir
-                    char text[TOTAL_CHARACTER_PER_LINE];
-
-                    gets(text, sizeof(text), stdin);
+                case 1: // Inseri
+                    fgets(text, sizeof(text), stdin);
                     addNewLine(textEditor, text);
                     break;
                 case 2: // remover m, n
-                    removeRows(textEditor, commandLine)
+                    removeRows(textEditor, commandLine);
                     break;
                 case 3: // linha m (to test)
                     changeCurrentLine(textEditor, commandLine);
                     break;
                  case 4: // localizar %x
-                    // TO-DO 
+                    // TO-DO
                     break;
                 case 5: // alterar %x %y %
-                    // TO-DO 
+                    // TO-DO
                     break;
                 case 6: // ultimo (to test)
                     getUltimoID(textEditor);
                     break;
                 case 7: // imprimir m, n
-                    // TO-DO 
+                    printLines(textEditor, commandLine);
                     break;
                 case 8: // fim
                     flagRunning = 0;
                     break;
                 default:
-                    // TO-DO 
+                    // TO-DO
                     break;
             }
         } else {
@@ -124,6 +125,8 @@ void addNewLine(List *textEditor, char *textLine) {
             newRow -> flagCurrentLine = 1;
             newRow -> idLine = textEditor -> currentRow -> idLine + 1;
             newRow -> previousRow = textEditor -> currentRow;
+
+            textEditor -> currentRow -> flagCurrentLine = 0;
 
             if (textEditor -> currentRow -> idLine == textEditor -> lastRow -> idLine) {
                 textEditor -> currentRow -> nextRow = newRow;
@@ -190,28 +193,28 @@ int checkCommand(int startIndexOfCommand, char *textLine) {
 
     takeCommand(startIndexOfCommand, textLine, command);
 
-    if (equalsToCommandReaded(command, "inserir") != 0) {
+    if (equalsToCommandReaded(command, "inserir\0") != 0) {
         printf("\nInserir Command\n");
         return 1;
-    } else if (equalsToCommandReaded(command, "remover") != 0) {
+    } else if (equalsToCommandReaded(command, "remover\0") != 0) {
         printf("\nRemover Command\n");
         return 2;
-    } else if (equalsToCommandReaded(command, "linha") != 0) {
+    } else if (equalsToCommandReaded(command, "linha\0") != 0) {
         printf("\nLinha Command\n");
         return 3;
-    } else if (equalsToCommandReaded(command, "localizar") != 0) {
+    } else if (equalsToCommandReaded(command, "localizar\0") != 0) {
         printf("\nLocalizar Command\n");
         return 4;
-    } else if (equalsToCommandReaded(command, "alterar") != 0) {
+    } else if (equalsToCommandReaded(command, "alterar\0") != 0) {
         printf("\nAlterar Command\n");
         return 5;
-    } else if (equalsToCommandReaded(command, "ultimo") != 0) {
+    } else if (equalsToCommandReaded(command, "ultimo\0") != 0) {
         printf("\nUltimo Command\n");
         return 6;
-    } else if (equalsToCommandReaded(command, "imprimir") != 0) {
+    } else if (equalsToCommandReaded(command, "imprimir\0") != 0) {
         printf("\nImprimir Command\n");
         return 7;
-    } else if (equalsToCommandReaded(command, "fim") != 0) {
+    } else if (equalsToCommandReaded(command, "fim\0") != 0) {
         printf("\nFim Command\n");
         return 8;
     } else {
@@ -233,10 +236,17 @@ void takeCommand(int startIndexOfCommand, char *textLine, char *command) {
 
 int equalsToCommandReaded(char *string1, char *string2) {
     int i = 0;
-    int string1Size = stringSize(string1) - 1;
+    int string1Size = stringSize(string1);
     int string2Size = stringSize(string2);
 
-    printf("\n%d == %d, %s == %s\n", string1Size, string2Size, string1, string2);
+    if (contains(string1, "\n\0") != -1) {
+        string1Size--;
+    }
+
+    if (contains(string2, "\n\0") != -1) {
+        string2Size--;
+    }
+    // printf("\n%d == %d, %s == %s\n", string1Size, string2Size, string1, string2);
 
     if (string1Size != string2Size) {
         return 0;
@@ -271,9 +281,11 @@ void changeCurrentLine(List *textEditor, char *command) {
         i = 7;
 
         while (j < 5 && *(command + i) != '\0') {
-            lineNumber[j] = *(command + i);
+            if (*(command + i) != ' ') {
+                lineNumber[j] = *(command + i);
+                j++;
+            }
             i++;
-            j++;
         }
 
         int lineRefered = atoi(lineNumber);
@@ -281,7 +293,7 @@ void changeCurrentLine(List *textEditor, char *command) {
         if (lineRefered > textEditor -> quantRows || lineNumber <= 0) {
             printf("ERRO: LINHA NÃO EXISTE");
         } else {
-            int currentLine = textEditor -> currentLine;
+            int currentLine = textEditor -> currentRow -> idLine;
 
             if (currentLine == lineRefered) {
                 printf("LINHA JÁ É A ACTUAL");
@@ -320,9 +332,9 @@ void changeCurrentLine(List *textEditor, char *command) {
 
 void getUltimoID(List *textEditor) {
     if (textEditor -> lastRow != NULL) {
-        printf("\n%d", textEditor -> lastRow -> idLine);
+        printf("\n%d\n", textEditor -> lastRow -> idLine);
     } else {
-        printf("\nTextEditor Vazio");
+        printf("\nTextEditor Vazio\n");
     }
 }
 
@@ -349,46 +361,134 @@ int contains(char *string, char *subString) {
             return i;
         }
     }
-    return 0;
+    return -1;
 }
+
+void printRow(Row *row) {
+    if (row != NULL) {
+        if (row -> flagCurrentLine != 1) {
+            printf("\n%d %s", row -> idLine, row -> character);
+        } else {
+            printf("\n→ %d %s", row -> idLine, row -> character);
+        }
+    }
+}
+
 
 void printLines(List *textEditor, char *command) {
     if (stringSize(command) < 13) {
         printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
     } else {
-        char startLine[] = {'a', 'a', 'a', 'a', 'a'};
-        char endLine[] = {'a', 'a', 'a', 'a', 'a'};
+        int printStart = 0;
+        int printEnd = 0; 
 
-        int commaIndex = contains(command, ",");
-        int k = 0;
-        int i = 0;
+        int returnResult = getTwoParametersOfCommand(command, &printStart, &printEnd);
 
-        for (i = commaIndex + 1; command[i] != '\0'; i++, k++) {
-            endLine[k] = command[i];
-        }
-
-        int spaceIndex = contains(command, " ");
-
-        for (i = spaceIndex + 1, k =  0; command[i] != '\0'; i++, k++) {
-            startLine[k] = command[i];
-        }
-
-        int printStart = atoi(startLine);
-        int printEnd = atoi(endLine);
-
-        if (printEnd > 0 && printStart > 0) {
-            if (printStart > printEnd) {
-                printf("\nERROR: Start line greater than printStart");
+        if (returnResult == 1) {
+            if (printStart > textEditor -> quantRows || printEnd > textEditor -> quantRows) {
+                printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d", textEditor -> quantRows);
             } else {
-                
+
+                printf("\nStart: %d - End: %d\n", printStart, printEnd);
+
+                if (printStart == textEditor -> currentRow -> idLine) {
+                    Row *actualRow = textEditor -> currentRow;
+
+                    while (printStart <= printEnd) {
+                        printRow(actualRow);
+                        actualRow = actualRow -> nextRow;
+                        printStart++;
+                    }
+                } else {
+                    Row *actualRow = textEditor -> firstRow;
+
+                    while (actualRow != NULL && actualRow -> idLine != printStart) {
+                        actualRow =  actualRow -> nextRow;
+                        printf("\nentrou\n");
+                    }
+
+                    while (printStart <= printEnd) {
+                        printRow(actualRow);
+                        actualRow = actualRow -> nextRow;
+                        printStart++;
+                    }
+                }
             }
         } else {
-            printf("\nERROR: NOT VALID LINES");
+            switch (returnResult)
+            {
+                case -1:
+                    printf("\nERRO: there\'s no comma separator to command");
+                    break;
+                case -2:
+                    printf("\nERRO: there\'s no space on command and it must contain");
+                    break;
+                case -3:
+                    printf("\nERRO: Not valid lines, not greater than 0");
+                    break;
+                case -4:
+                    printf("\nERRO: Start line greater than printStart");
+                    break;
+                case -5:
+                    printf("\nERRO: Not first parameter passed");
+                    break;
+                default:
+                    break;
+            }
         }
-        
     }
 }
 
 void removeRows(List *textEditor, char *command) {
+    
+}
 
+int getTwoParametersOfCommand(char *command, int *firstArgument, int *secondArgument) {
+        char startLine[] = {'a', 'a', 'a', 'a', 'a'};
+        char endLine[] = {'a', 'a', 'a', 'a', 'a'};
+
+        int commaIndex = contains(command, ",");
+
+        if (commaIndex != -1) {
+            int k = 0;
+            int i = 0;
+
+            for (i = commaIndex + 1; command[i] != '\0'; i++) {
+                if (command[i] != ' ') {
+                    endLine[k] = command[i];
+                    k++;
+                }
+            }
+
+            int spaceIndex = contains(command, " ");
+
+            if (spaceIndex != -1) {
+                for (i = spaceIndex + 1, k =  0; command[i] != '\0'; i++) {
+                    if (command[i] != ' ') {
+                        startLine[k] = command[i];
+                        k++;
+                    }
+                }
+
+                if (k == 0) {
+                    return -5; // Not first parameter passed
+                } else {
+                    *firstArgument = atoi(startLine);
+                    *secondArgument = atoi(endLine);
+
+                    if (*firstArgument > 0 && *secondArgument > 0) {
+                        if (*firstArgument > *secondArgument) {
+                            return -4; // Start greater than End
+                        }
+                    } else {
+                        return -3; // Not valid lines, not greater than 0
+                    }
+                }
+            } else {
+                return -2; // there's no space on command and it must contain
+            }
+        } else {
+            return -1; // there's no comma separator to command
+        }
+        return 1;
 }
