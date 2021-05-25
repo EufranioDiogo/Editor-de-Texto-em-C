@@ -388,9 +388,6 @@ void printLines(List *textEditor, char *command) {
             if (printStart > textEditor -> quantRows || printEnd > textEditor -> quantRows) {
                 printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d", textEditor -> quantRows);
             } else {
-
-                printf("\nStart: %d - End: %d\n", printStart, printEnd);
-
                 if (printStart == textEditor -> currentRow -> idLine) {
                     Row *actualRow = textEditor -> currentRow;
 
@@ -440,7 +437,91 @@ void printLines(List *textEditor, char *command) {
 }
 
 void removeRows(List *textEditor, char *command) {
-    
+    if (stringSize(command) < 13) {
+        printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+    } else {
+        int printStart = 0;
+        int printEnd = 0; 
+
+        int returnResult = getTwoParametersOfCommand(command, &printStart, &printEnd);
+
+        if (returnResult == 1) {
+            if (printStart > textEditor -> quantRows || printEnd > textEditor -> quantRows) {
+                printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d", textEditor -> quantRows);
+            } else {
+                Row *actualRow = textEditor -> firstRow;
+                Row *trashRow = NULL;
+
+                while (actualRow != NULL && actualRow -> idLine != printStart) {
+                    actualRow =  actualRow -> nextRow;
+                    printf("\nentrou\n");
+                }
+
+                while (printStart <= printEnd) {
+                    if (actualRow -> idLine == textEditor -> firstRow -> idLine) {
+                        textEditor -> firstRow = textEditor -> firstRow -> nextRow;
+                        if (textEditor -> firstRow != NULL) {
+                            textEditor -> firstRow -> previousRow = NULL;
+                            textEditor -> firstRow -> idLine = 1;
+                            updateRowsIDs(textEditor -> firstRow);
+                        } else {
+                            textEditor -> lastRow = NULL;
+                            textEditor -> currentRow = NULL;
+                        }
+                    } else {
+                        if (actualRow -> nextRow == NULL) {
+                            textEditor -> lastRow = actualRow -> previousRow;
+                            textEditor -> lastRow -> nextRow = NULL;
+                        } else {
+                            actualRow -> nextRow -> previousRow = actualRow -> previousRow;
+                            actualRow -> previousRow -> nextRow = actualRow -> nextRow;
+
+                            updateRowsIDs(actualRow -> previousRow);
+                        }
+                    }
+
+                    trashRow = actualRow;
+                    actualRow = actualRow -> nextRow;
+
+                    textEditor -> quantRows -= 1;
+                    free(trashRow);
+                    printStart++;
+                }
+
+                if (actualRow != NULL) {
+                    if (actualRow -> previousRow != NULL) {
+                        textEditor -> currentRow = actualRow -> previousRow;
+                        textEditor -> currentRow -> flagCurrentLine = 1;
+                    } else if (actualRow -> idLine == textEditor -> firstRow -> idLine) {
+                        textEditor -> currentRow = actualRow;
+                        textEditor -> currentRow -> flagCurrentLine = 1;
+                        textEditor -> lastRow = actualRow;
+                    }
+                }
+            }
+        } else {
+            switch (returnResult)
+            {
+                case -1:
+                    printf("\nERRO: there\'s no comma separator to command");
+                    break;
+                case -2:
+                    printf("\nERRO: there\'s no space on command and it must contain");
+                    break;
+                case -3:
+                    printf("\nERRO: Not valid lines, not greater than 0");
+                    break;
+                case -4:
+                    printf("\nERRO: Start line greater than printStart");
+                    break;
+                case -5:
+                    printf("\nERRO: Not first parameter passed");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }
 
 int getTwoParametersOfCommand(char *command, int *firstArgument, int *secondArgument) {
