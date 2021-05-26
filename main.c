@@ -20,10 +20,14 @@ void removeRows(List *textEditor, char *command);
 int getTwoParametersOfCommand(char *command, int *firstArgument, int *secondArgument);
 void printRow(Row *row);
 int contains(char *string, char *subString);
+int containsWithStartIndex(char *string, char *subString, int index);
+void searchPattern(List *textEditor, char *textLine);
+
 
 int main() {
     List *textEditor = (List *)(malloc(sizeof(List)));
     int flagRunning = 1;
+    int flagInsertMode = 0;
 
     while(flagRunning == 1) {
         char commandLine[TOTAL_CHARACTER_PER_LINE];
@@ -31,38 +35,46 @@ int main() {
 
         int isCommand = isComand(commandLine);
 
-        if (isCommand != -1) {
+        if (isCommand == -1 && flagInsertMode == 1) {
+            addNewLine(textEditor, commandLine);
+        } else if (isCommand != -1) {
             int startCommandIndex = isCommand;
-
-            char text[TOTAL_CHARACTER_PER_LINE];
             int commandCode = checkCommand(startCommandIndex, commandLine);
-            printf("\nCommand code: %d\n", commandCode);
             
             switch (commandCode) {
-                case 1: // Inseri
-                    fgets(text, sizeof(text), stdin);
-                    addNewLine(textEditor, text);
+                case 1: // Inserir
+                    flagInsertMode = 1;
                     break;
-                case 2: // remover m, n
+                case 2: // remover m, n (More tests)
                     removeRows(textEditor, commandLine);
+                    flagInsertMode = 0;
                     break;
                 case 3: // linha m (to test)
                     changeCurrentLine(textEditor, commandLine);
+                    flagInsertMode = 0;
                     break;
                  case 4: // localizar %x
-                    // TO-DO
+                    printf("\n---------------------------------------------------------------");
+                    searchPattern(textEditor, commandLine);
+                    flagInsertMode = 0;
+                    printf("\n---------------------------------------------------------------");
                     break;
                 case 5: // alterar %x %y %
                     // TO-DO
                     break;
                 case 6: // ultimo (to test)
                     getUltimoID(textEditor);
+                    flagInsertMode = 0;
                     break;
                 case 7: // imprimir m, n
+                    printf("\n---------------------------------------------------------------");
                     printLines(textEditor, commandLine);
+                    flagInsertMode = 0;
+                    printf("\n---------------------------------------------------------------");
                     break;
                 case 8: // fim
                     flagRunning = 0;
+                    flagInsertMode = 0;
                     break;
                 default:
                     // TO-DO
@@ -116,7 +128,7 @@ void addNewLine(List *textEditor, char *textLine) {
             textEditor -> lastRow = textEditor -> firstRow;
             textEditor -> currentRow = textEditor -> lastRow;
             textEditor -> currentRow -> flagCurrentLine = 1;
-        } else {
+        } else if (textEditor -> currentRow != NULL) {
             Row *newRow = (Row *)(malloc(sizeof(Row)));
 
             setUpRow(newRow);
@@ -144,6 +156,23 @@ void addNewLine(List *textEditor, char *textLine) {
             textEditor -> quantRows += 1;
 
             updateRowsIDs(textEditor -> currentRow);
+        } else if (textEditor -> currentRow == NULL) {
+            Row *newRow = (Row *)(malloc(sizeof(Row)));
+
+            setUpRow(newRow);
+            copyTextToNewLine(newRow, textLine);
+
+            newRow -> nextRow = textEditor -> firstRow;
+            textEditor -> firstRow -> previousRow = newRow;
+            newRow -> flagCurrentLine = 1;
+            newRow -> idLine = 1;
+            textEditor -> currentLine = 1;
+            textEditor -> firstRow = newRow;
+            textEditor -> currentRow = textEditor -> firstRow;
+
+            textEditor -> quantRows += 1;
+            updateRowsIDs(textEditor -> currentRow);
+
         }
     } else {
         printf("ERROR: Linha com a quantidade máxima de caracteres atingida");
@@ -194,28 +223,20 @@ int checkCommand(int startIndexOfCommand, char *textLine) {
     takeCommand(startIndexOfCommand, textLine, command);
 
     if (equalsToCommandReaded(command, "inserir\0") != 0) {
-        printf("\nInserir Command\n");
         return 1;
     } else if (equalsToCommandReaded(command, "remover\0") != 0) {
-        printf("\nRemover Command\n");
         return 2;
     } else if (equalsToCommandReaded(command, "linha\0") != 0) {
-        printf("\nLinha Command\n");
         return 3;
     } else if (equalsToCommandReaded(command, "localizar\0") != 0) {
-        printf("\nLocalizar Command\n");
         return 4;
     } else if (equalsToCommandReaded(command, "alterar\0") != 0) {
-        printf("\nAlterar Command\n");
         return 5;
     } else if (equalsToCommandReaded(command, "ultimo\0") != 0) {
-        printf("\nUltimo Command\n");
         return 6;
     } else if (equalsToCommandReaded(command, "imprimir\0") != 0) {
-        printf("\nImprimir Command\n");
         return 7;
     } else if (equalsToCommandReaded(command, "fim\0") != 0) {
-        printf("\nFim Command\n");
         return 8;
     } else {
         return -1;
@@ -290,42 +311,49 @@ void changeCurrentLine(List *textEditor, char *command) {
 
         int lineRefered = atoi(lineNumber);
 
-        if (lineRefered > textEditor -> quantRows || lineNumber <= 0) {
+        if (lineRefered > textEditor -> quantRows || lineNumber < 0) {
             printf("ERRO: LINHA NÃO EXISTE");
         } else {
             int currentLine = textEditor -> currentRow -> idLine;
 
-            if (currentLine == lineRefered) {
-                printf("LINHA JÁ É A ACTUAL");
-            } else {
-                if (lineRefered > currentLine) {
-                    int quantSteps = lineRefered - currentLine;
-                    Row *auxRow = textEditor -> currentRow;
-
-                    textEditor -> currentRow -> flagCurrentLine = 0;
-
-                    while (quantSteps > 0) {
-                        auxRow = auxRow -> nextRow;
-                        quantSteps--;
-                    }
-                    textEditor -> currentLine = lineRefered;
-                    textEditor -> currentRow = auxRow;
-                    textEditor -> currentRow -> flagCurrentLine = 1;
+            if (lineRefered != 0) {
+                if (currentLine == lineRefered) {
+                    printf("LINHA JÁ É A ACTUAL");
                 } else {
-                    int quantSteps = currentLine - lineRefered; 
-                    Row *auxRow = textEditor -> currentRow;
+                    if (lineRefered > currentLine) {
+                        int quantSteps = lineRefered - currentLine;
+                        Row *auxRow = textEditor -> currentRow;
 
-                    textEditor -> currentRow -> flagCurrentLine = 0;
+                        textEditor -> currentRow -> flagCurrentLine = 0;
 
-                    while (quantSteps > 0) {
-                        auxRow = auxRow -> previousRow;
-                        quantSteps--;
+                        while (quantSteps > 0) {
+                            auxRow = auxRow -> nextRow;
+                            quantSteps--;
+                        }
+                        textEditor -> currentLine = lineRefered;
+                        textEditor -> currentRow = auxRow;
+                        textEditor -> currentRow -> flagCurrentLine = 1;
+                    } else {
+                        int quantSteps = currentLine - lineRefered; 
+                        Row *auxRow = textEditor -> currentRow;
+
+                        textEditor -> currentRow -> flagCurrentLine = 0;
+
+                        while (quantSteps > 0) {
+                            auxRow = auxRow -> previousRow;
+                            quantSteps--;
+                        }
+                        textEditor -> currentLine = lineRefered;
+                        textEditor -> currentRow = auxRow;
+                        textEditor -> currentRow -> flagCurrentLine = 1;
                     }
-                    textEditor -> currentLine = lineRefered;
-                    textEditor -> currentRow = auxRow;
-                    textEditor -> currentRow -> flagCurrentLine = 1;
                 }
+            } else {
+                textEditor -> currentLine = 0;
+                textEditor -> currentRow -> flagCurrentLine = 0;
+                textEditor -> currentRow = NULL;
             }
+            
         }
     }
 }
@@ -343,13 +371,51 @@ int contains(char *string, char *subString) {
         return -1;
     }
 
-    int flagSubStringFounded;
+    int flagSubStringFounded = 1;
     int mainStringSize = stringSize(string);
     int subStringSize = stringSize(subString);
     int quantPossibleSubstringInString = mainStringSize / subStringSize;
 
     for (int i = 0; i < quantPossibleSubstringInString; i++) {
         flagSubStringFounded = 1;
+        for (int j = 0; j < subStringSize; j++) {
+            if (subString[j] != string[i + j]) {
+                flagSubStringFounded = 0;
+                break;
+            }
+        }
+
+        if (flagSubStringFounded == 1) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int containsWithStartIndex(char *string, char *subString, int index) {
+    if (stringSize(subString) > stringSize(string)) {
+        return -1;
+    }
+
+    int flagSubStringFounded = 1;
+    int mainStringSize = stringSize(string);
+    int subStringSize = stringSize(subString);
+
+    // printf("\n%s -> %d == %s -> %d\n", string, mainStringSize, subString, subStringSize);
+
+    if (contains(string, "\n\0") != -1) {
+        mainStringSize--;
+    }
+
+    if (contains(subString, "\n\0") != -1) {
+        subStringSize--;
+    }
+
+    // printf("\n%s -> %d == %s -> %d\n", string, mainStringSize, subString, subStringSize);
+
+    for (int i = index; i + subStringSize <= mainStringSize; i++) {
+        flagSubStringFounded = 1;
+
         for (int j = 0; j < subStringSize; j++) {
             if (subString[j] != string[i + j]) {
                 flagSubStringFounded = 0;
@@ -377,7 +443,11 @@ void printRow(Row *row) {
 
 void printLines(List *textEditor, char *command) {
     if (stringSize(command) < 13) {
-        printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+        if (containsWithStartIndex(command, ",", 0) == -1) {
+            printf("\nERRO: Falta virgula");
+        } else {
+            printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+        }
     } else {
         int printStart = 0;
         int printEnd = 0; 
@@ -573,3 +643,63 @@ int getTwoParametersOfCommand(char *command, int *firstArgument, int *secondArgu
         }
         return 1;
 }
+
+void searchPattern(List *textEditor, char *command) {
+    if (stringSize(command) < 13) {
+        printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+    } else {
+        int indexOfPercentage = containsWithStartIndex(command, "%\0", 0);
+
+        if (indexOfPercentage != -1) {
+            char searchElement[20];
+            int k = 0;
+            int i ;
+            int commandSize = stringSize(command);
+
+            if (contains(command, "\n\0") != -1) {
+                commandSize--;
+            }
+
+
+            for (i = indexOfPercentage + 1; command[i] != '\0' && command[i] != '\0' && i < commandSize; i++) {
+                searchElement[k] = command[i];
+                k++;
+            }
+            searchElement[k] = '\0';
+
+            Row *actualRow = textEditor -> firstRow;
+            i = 0;
+            int j = 0;
+            int searchElementSize = stringSize(searchElement);
+
+
+            while (actualRow != NULL) {
+                if (actualRow -> flagCurrentLine == 1) {
+                    printf("→ ");
+                }
+                printf("%d ", actualRow -> idLine);
+                while (i != -1) {
+                    i = containsWithStartIndex(actualRow -> character, searchElement, i);
+
+                    if (i != -1) {
+                        for (; j < i; j++) {
+                            if (actualRow -> character[i] != '\n') {
+                                printf("%c", actualRow -> character[j]);
+                            }
+                        }
+                        for (; searchElementSize > 0; i++, searchElementSize--) {
+                            printf("\033[1m%c\033[37m", actualRow -> character[i]);
+                        }
+                        searchElementSize = stringSize(searchElement);
+                        j = i;
+                    }
+                }
+
+                actualRow = actualRow -> nextRow;
+                printf("\n");
+            }
+            // \033[1m ok \033[37m
+        }
+    }
+}
+
