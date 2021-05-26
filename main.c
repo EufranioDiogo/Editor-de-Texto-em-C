@@ -67,6 +67,7 @@ int main() {
                     break;
                 case 5: // alterar %x %y %
                     changeOcorrences(textEditor -> currentRow, commandLineInput);
+                    flagInsertMode = 0;
                     break;
                 case 6: // ultimo (to test)
                     getUltimoID(textEditor);
@@ -83,7 +84,7 @@ int main() {
                     flagInsertMode = 0;
                     break;
                 default:
-                    // TO-DO
+                    flagInsertMode = 0;
                     break;
             }
         } else {
@@ -727,36 +728,30 @@ void changeOcorrences(Row *actualRow, char *command) {
 
             int firstDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, 0);
             int secondDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, firstDelimiterOcorrenceIndex + 1);
-            int lastDelimiterOcorrenceIndex = stringSize(command) - 2;
+            int lastDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, secondDelimiterOcorrenceIndex + 1);
 
-            printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
+            //printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
 
             if (firstDelimiterOcorrenceIndex != -1 && secondDelimiterOcorrenceIndex != -1 && lastDelimiterOcorrenceIndex != -1) {
                 for (k = 0, i = firstDelimiterOcorrenceIndex + 1;  i < secondDelimiterOcorrenceIndex; i++) {
                     oldText[k] = command[i];
                     k++;
                 }
-                oldText[k - 1] = '\0';
+                oldText[k] = '\0';
                 int oldTextSize = stringSize(oldText);
-                printf("\nOld Text: %s Size: %d", oldText, oldTextSize);
+                //printf("\nOld Text: %s Size: %d", oldText, oldTextSize);
 
                 for (k = 0, i = secondDelimiterOcorrenceIndex + 1;  i < lastDelimiterOcorrenceIndex; i++) {
                     newText[k] = command[i];
                     k++;
                 }
 
-                if (k == 0) {
-                    newText[k] = ' ';
-                    newText[k + 1] = '\0';
-                    k++;
-                } else {
-                    newText[k - 1] = '\0';
-                }
+                newText[k] = '\0';
 
                 int newTextSize = stringSize(newText);
-                printf("\nNew Text: %s Size: %d", newText, newTextSize);
+                //printf("\nNew Text: %s Size: %d", newText, newTextSize);
 
-                
+
                 k = 0;
                 i = 0;
                 int h = 0;
@@ -767,7 +762,7 @@ void changeOcorrences(Row *actualRow, char *command) {
                 while (indexToReplace != -1) {
                     char text[100];
 
-                    for (; k < indexToReplace; k++) {
+                    for (k = 0; k < indexToReplace; k++) {
                         text[k] = actualRow -> character[i];
                         i++;
                     }
@@ -779,11 +774,7 @@ void changeOcorrences(Row *actualRow, char *command) {
                     }
 
                     text[k] = '\0';
-                    printf("\nText: %s Size: %d", text, stringSize(text));
-
-                    for (h = 0; h < stringSize(text); h++) {
-                        actualRow -> character[h] = text[h];
-                    }
+                    //printf("\nText: %s Size: %d", text, stringSize(text));
 
                     i = indexToReplace + stringSize(oldText);
 
@@ -798,7 +789,7 @@ void changeOcorrences(Row *actualRow, char *command) {
                     }
 
                     actualRow -> character[h] = '\0';
-                    printf("\nActual Character: %s Actual Size: %d", actualRow -> character, stringSize(actualRow -> character));
+                    //printf("\nActual Character: %s Actual Size: %d", actualRow -> character, stringSize(actualRow -> character));
 
                     i = 0;
                     k = 0;
@@ -806,13 +797,10 @@ void changeOcorrences(Row *actualRow, char *command) {
                     indexToReplace = containsWithStartIndex(actualRow -> character, oldText, indexToReplace + stringSize(oldText));
                 }
             } else {
-                printf("\nERRO: PARAMETROS ENVIADOS INSUFICIENTES");
+                printf("\nERRO: Delimitador ocorre somente duas vezes\n");
             }
-            
-
-
         } else {
-            printf("ERROR: NÃO EXISTE LINHA CORRENTE VÁLIDA");
+            printf("\nERRO: NÃO EXISTE LINHA CORRENTE VÁLIDA\n");
         }
     }
 }
