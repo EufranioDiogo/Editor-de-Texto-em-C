@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tda.h"
+#define STYLE_BOLD "\033[1m"
+#define STYLE_NO_BOLD "\033[22m"
+#define STYLE_UNDERLINE    "\033[4m"
+#define STYLE_NO_UNDERLINE "\033[24m"
+
 
 void initializeTextEditor(List *textEditor);
 int isComand(char *textLine);
@@ -22,6 +27,7 @@ void printRow(Row *row);
 int contains(char *string, char *subString);
 int containsWithStartIndex(char *string, char *subString, int index);
 void searchPattern(List *textEditor, char *textLine);
+void changeOcorrences(Row *actualRow, char *command);
 
 
 int main() {
@@ -30,37 +36,37 @@ int main() {
     int flagInsertMode = 0;
 
     while(flagRunning == 1) {
-        char commandLine[TOTAL_CHARACTER_PER_LINE];
-        fgets(commandLine, sizeof(commandLine), stdin);
+        char commandLineInput[TOTAL_CHARACTER_PER_LINE];
+        fgets(commandLineInput, sizeof(commandLineInput), stdin);
 
-        int isCommand = isComand(commandLine);
+        int isCommand = isComand(commandLineInput);
 
         if (isCommand == -1 && flagInsertMode == 1) {
-            addNewLine(textEditor, commandLine);
+            addNewLine(textEditor, commandLineInput);
         } else if (isCommand != -1) {
             int startCommandIndex = isCommand;
-            int commandCode = checkCommand(startCommandIndex, commandLine);
+            int commandCode = checkCommand(startCommandIndex, commandLineInput);
             
             switch (commandCode) {
                 case 1: // Inserir
                     flagInsertMode = 1;
                     break;
                 case 2: // remover m, n (More tests)
-                    removeRows(textEditor, commandLine);
+                    removeRows(textEditor, commandLineInput);
                     flagInsertMode = 0;
                     break;
                 case 3: // linha m (to test)
-                    changeCurrentLine(textEditor, commandLine);
+                    changeCurrentLine(textEditor, commandLineInput);
                     flagInsertMode = 0;
                     break;
                  case 4: // localizar %x
                     printf("\n---------------------------------------------------------------");
-                    searchPattern(textEditor, commandLine);
+                    searchPattern(textEditor, commandLineInput);
                     flagInsertMode = 0;
-                    printf("\n---------------------------------------------------------------");
+                    printf("\n---------------------------------------------------------------\n");
                     break;
                 case 5: // alterar %x %y %
-                    // TO-DO
+                    changeOcorrences(textEditor -> currentRow, commandLineInput);
                     break;
                 case 6: // ultimo (to test)
                     getUltimoID(textEditor);
@@ -68,9 +74,9 @@ int main() {
                     break;
                 case 7: // imprimir m, n
                     printf("\n---------------------------------------------------------------");
-                    printLines(textEditor, commandLine);
+                    printLines(textEditor, commandLineInput);
                     flagInsertMode = 0;
-                    printf("\n---------------------------------------------------------------");
+                    printf("\n---------------------------------------------------------------\n");
                     break;
                 case 8: // fim
                     flagRunning = 0;
@@ -688,14 +694,19 @@ void searchPattern(List *textEditor, char *command) {
                             }
                         }
                         for (; searchElementSize > 0; i++, searchElementSize--) {
-                            printf("\033[1m%c\033[37m", actualRow -> character[i]);
+                            //printf(STYLE_UNDERLINE);
+                            printf("\033[32;1m%c\033[0m", actualRow -> character[i]);
+                            //printf(STYLE_NO_UNDERLINE);
                         }
                         searchElementSize = stringSize(searchElement);
                         j = i;
+                        i--;
                     }
                 }
 
                 actualRow = actualRow -> nextRow;
+                i = 0;
+                j = 0;
                 printf("\n");
             }
             // \033[1m ok \033[37m
@@ -703,3 +714,105 @@ void searchPattern(List *textEditor, char *command) {
     }
 }
 
+void changeOcorrences(Row *actualRow, char *command) {
+    if (stringSize(command) < 13) {
+        printf("ERRO: FALTA PARAMETROS PARA O COMANDO");
+    } else {
+        if (actualRow != 0) {
+            char delimiter[2] = {command[stringSize(command) - 2], '\0' };
+            int i;
+            int k = 0;
+            char oldText[80];
+            char newText[80];
+
+            int firstDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, 0);
+            int secondDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, firstDelimiterOcorrenceIndex + 1);
+            int lastDelimiterOcorrenceIndex = stringSize(command) - 2;
+
+            printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
+
+            if (firstDelimiterOcorrenceIndex != -1 && secondDelimiterOcorrenceIndex != -1 && lastDelimiterOcorrenceIndex != -1) {
+                for (k = 0, i = firstDelimiterOcorrenceIndex + 1;  i < secondDelimiterOcorrenceIndex; i++) {
+                    oldText[k] = command[i];
+                    k++;
+                }
+                oldText[k - 1] = '\0';
+                int oldTextSize = stringSize(oldText);
+                printf("\nOld Text: %s Size: %d", oldText, oldTextSize);
+
+                for (k = 0, i = secondDelimiterOcorrenceIndex + 1;  i < lastDelimiterOcorrenceIndex; i++) {
+                    newText[k] = command[i];
+                    k++;
+                }
+
+                if (k == 0) {
+                    newText[k] = ' ';
+                    newText[k + 1] = '\0';
+                    k++;
+                } else {
+                    newText[k - 1] = '\0';
+                }
+
+                int newTextSize = stringSize(newText);
+                printf("\nNew Text: %s Size: %d", newText, newTextSize);
+
+                
+                k = 0;
+                i = 0;
+                int h = 0;
+                int indexToReplace = 0;
+                
+                indexToReplace = containsWithStartIndex(actualRow -> character, oldText, indexToReplace);
+
+                while (indexToReplace != -1) {
+                    char text[100];
+
+                    for (; k < indexToReplace; k++) {
+                        text[k] = actualRow -> character[i];
+                        i++;
+                    }
+                    text[k] = '\0';
+
+                    for (h = 0; h < stringSize(newText); h++) {
+                        text[k] = newText[h];
+                        k++;
+                    }
+
+                    text[k] = '\0';
+                    printf("\nText: %s Size: %d", text, stringSize(text));
+
+                    for (h = 0; h < stringSize(text); h++) {
+                        actualRow -> character[h] = text[h];
+                    }
+
+                    i = indexToReplace + stringSize(oldText);
+
+                    for (; i < stringSize(actualRow -> character); k++) {
+                        text[k] = actualRow -> character[i];
+                        i++;
+                    }
+                    text[k] = '\0';
+
+                    for (h = 0; h < stringSize(text); h++) {
+                        actualRow -> character[h] = text[h];
+                    }
+
+                    actualRow -> character[h] = '\0';
+                    printf("\nActual Character: %s Actual Size: %d", actualRow -> character, stringSize(actualRow -> character));
+
+                    i = 0;
+                    k = 0;
+                    h = 0;
+                    indexToReplace = containsWithStartIndex(actualRow -> character, oldText, indexToReplace + stringSize(oldText));
+                }
+            } else {
+                printf("\nERRO: PARAMETROS ENVIADOS INSUFICIENTES");
+            }
+            
+
+
+        } else {
+            printf("ERROR: NÃO EXISTE LINHA CORRENTE VÁLIDA");
+        }
+    }
+}
