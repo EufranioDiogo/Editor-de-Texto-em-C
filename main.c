@@ -63,11 +63,12 @@ int main() {
                     printf("\n---------------------------------------------------------------");
                     searchPattern(textEditor, commandLineInput);
                     flagInsertMode = 0;
-                    printf("\n---------------------------------------------------------------\n");
+                    printf("\n---------------------------------------------------------------");
                     break;
                 case 5: // alterar %x %y %
                     changeOcorrences(textEditor -> currentRow, commandLineInput);
                     flagInsertMode = 0;
+                    printf("\nSaiu");
                     break;
                 case 6: // ultimo (to test)
                     getUltimoID(textEditor);
@@ -77,7 +78,7 @@ int main() {
                     printf("\n---------------------------------------------------------------");
                     printLines(textEditor, commandLineInput);
                     flagInsertMode = 0;
-                    printf("\n---------------------------------------------------------------\n");
+                    printf("\n---------------------------------------------------------------");
                     break;
                 case 8: // fim
                     flagRunning = 0;
@@ -87,6 +88,7 @@ int main() {
                     flagInsertMode = 0;
                     break;
             }
+            printf("\n");
         } else {
             printf("\nPlease Enter a command");
         }
@@ -453,7 +455,7 @@ void printLines(List *textEditor, char *command) {
         if (containsWithStartIndex(command, ",", 0) == -1) {
             printf("\nERRO: Falta virgula");
         } else {
-            printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+            printf("\nERRO: QUANT PARAMETROS NÃO VALIDOS");
         }
     } else {
         int printStart = 0;
@@ -478,7 +480,6 @@ void printLines(List *textEditor, char *command) {
 
                     while (actualRow != NULL && actualRow -> idLine != printStart) {
                         actualRow =  actualRow -> nextRow;
-                        printf("\nentrou\n");
                     }
 
                     while (printStart <= printEnd) {
@@ -492,19 +493,19 @@ void printLines(List *textEditor, char *command) {
             switch (returnResult)
             {
                 case -1:
-                    printf("\nERRO: there\'s no comma separator to command");
+                    printf("\nERRO: não existe a virgula no comando");
                     break;
                 case -2:
-                    printf("\nERRO: there\'s no space on command and it must contain");
+                    printf("\nERRO: não tem espaço no comando e deve existir");
                     break;
                 case -3:
-                    printf("\nERRO: Not valid lines, not greater than 0");
+                    printf("\nERRO: Linha não válida, linha não maior que 0");
                     break;
                 case -4:
-                    printf("\nERRO: Start line greater than printStart");
+                    printf("\nERRO: Referência da linha de ínicio maior que a final");
                     break;
                 case -5:
-                    printf("\nERRO: Not first parameter passed");
+                    printf("\nERRO: Primeiro parametro não passado");
                     break;
                 default:
                     break;
@@ -529,9 +530,12 @@ void removeRows(List *textEditor, char *command) {
                 Row *actualRow = textEditor -> firstRow;
                 Row *trashRow = NULL;
 
+                if (textEditor -> currentRow != NULL) {
+                    textEditor -> currentRow -> flagCurrentLine = 0;
+                }
+
                 while (actualRow != NULL && actualRow -> idLine != printStart) {
                     actualRow =  actualRow -> nextRow;
-                    printf("\nentrou\n");
                 }
 
                 while (printStart <= printEnd) {
@@ -550,8 +554,10 @@ void removeRows(List *textEditor, char *command) {
                             textEditor -> lastRow = actualRow -> previousRow;
                             textEditor -> lastRow -> nextRow = NULL;
                         } else {
+                            actualRow -> flagCurrentLine = 0;
                             actualRow -> nextRow -> previousRow = actualRow -> previousRow;
                             actualRow -> previousRow -> nextRow = actualRow -> nextRow;
+
 
                             updateRowsIDs(actualRow -> previousRow);
                         }
@@ -580,19 +586,19 @@ void removeRows(List *textEditor, char *command) {
             switch (returnResult)
             {
                 case -1:
-                    printf("\nERRO: there\'s no comma separator to command");
+                    printf("\nERRO: não existe a virgula no comando");
                     break;
                 case -2:
-                    printf("\nERRO: there\'s no space on command and it must contain");
+                    printf("\nERRO: não tem espaço no comando e deve existir");
                     break;
                 case -3:
-                    printf("\nERRO: Not valid lines, not greater than 0");
+                    printf("\nERRO: Linha não válida, linha não maior que 0");
                     break;
                 case -4:
-                    printf("\nERRO: Start line greater than printStart");
+                    printf("\nERRO: Referência da linha de ínicio maior que a final");
                     break;
                 case -5:
-                    printf("\nERRO: Not first parameter passed");
+                    printf("\nERRO: Primeiro parametro não passado");
                     break;
                 default:
                     break;
@@ -679,7 +685,6 @@ void searchPattern(List *textEditor, char *command) {
             int j = 0;
             int searchElementSize = stringSize(searchElement);
 
-
             while (actualRow != NULL) {
                 if (actualRow -> flagCurrentLine == 1) {
                     printf("→ ");
@@ -730,7 +735,7 @@ void changeOcorrences(Row *actualRow, char *command) {
             int secondDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, firstDelimiterOcorrenceIndex + 1);
             int lastDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, secondDelimiterOcorrenceIndex + 1);
 
-            //printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
+            printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
 
             if (firstDelimiterOcorrenceIndex != -1 && secondDelimiterOcorrenceIndex != -1 && lastDelimiterOcorrenceIndex != -1) {
                 for (k = 0, i = firstDelimiterOcorrenceIndex + 1;  i < secondDelimiterOcorrenceIndex; i++) {
@@ -749,7 +754,7 @@ void changeOcorrences(Row *actualRow, char *command) {
                 newText[k] = '\0';
 
                 int newTextSize = stringSize(newText);
-                //printf("\nNew Text: %s Size: %d", newText, newTextSize);
+                printf("\nNew Text: %s Size: %d", newText, newTextSize);
 
 
                 k = 0;
@@ -760,7 +765,7 @@ void changeOcorrences(Row *actualRow, char *command) {
                 indexToReplace = containsWithStartIndex(actualRow -> character, oldText, indexToReplace);
 
                 while (indexToReplace != -1) {
-                    char text[100];
+                    char text[TOTAL_CHARACTER_PER_LINE];
 
                     for (k = 0; k < indexToReplace; k++) {
                         text[k] = actualRow -> character[i];
@@ -768,19 +773,19 @@ void changeOcorrences(Row *actualRow, char *command) {
                     }
                     text[k] = '\0';
 
-                    for (h = 0; h < stringSize(newText); h++) {
+                    for (h = 0; h < newTextSize; h++) {
                         text[k] = newText[h];
                         k++;
                     }
 
                     text[k] = '\0';
-                    //printf("\nText: %s Size: %d", text, stringSize(text));
+                    printf("\nText: %s Size: %d", text, stringSize(text));
 
-                    i = indexToReplace + stringSize(oldText);
+                    i = indexToReplace + oldTextSize;
 
-                    for (; i < stringSize(actualRow -> character); k++) {
+                    for (; i < stringSize(actualRow -> character); i++) {
                         text[k] = actualRow -> character[i];
-                        i++;
+                        k++;
                     }
                     text[k] = '\0';
 
@@ -789,12 +794,12 @@ void changeOcorrences(Row *actualRow, char *command) {
                     }
 
                     actualRow -> character[h] = '\0';
-                    //printf("\nActual Character: %s Actual Size: %d", actualRow -> character, stringSize(actualRow -> character));
+                    printf("\nActual Character: %s Actual Size: %d", actualRow -> character, stringSize(actualRow -> character));
 
                     i = 0;
                     k = 0;
                     h = 0;
-                    indexToReplace = containsWithStartIndex(actualRow -> character, oldText, indexToReplace + stringSize(oldText));
+                    indexToReplace = containsWithStartIndex(actualRow -> character, oldText, indexToReplace + oldTextSize);
                 }
             } else {
                 printf("\nERRO: Delimitador ocorre somente duas vezes\n");
