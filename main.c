@@ -846,12 +846,13 @@ void searchPattern(List *textEditor, char *command)
             i = 0;
             int j = 0;
             int searchElementSize = stringSize(searchElement);
+            printf("\n");
 
             while (actualRow != NULL)
             {
                 if (actualRow->flagCurrentLine == 1)
                 {
-                    printf("→ ");
+                    printf("\n→ ");
                 }
                 printf("%d ", actualRow->idLine);
                 while (i != -1)
@@ -862,11 +863,12 @@ void searchPattern(List *textEditor, char *command)
                     {
                         for (; j < i; j++)
                         {
-                            if (actualRow->character[i] != '\n')
+                            if (actualRow->character[j] != '\n')
                             {
                                 printf("%c", actualRow->character[j]);
                             }
                         }
+                        
                         for (; searchElementSize > 0; i++, searchElementSize--)
                         {
                             //printf(STYLE_UNDERLINE);
@@ -876,6 +878,10 @@ void searchPattern(List *textEditor, char *command)
                         searchElementSize = stringSize(searchElement);
                         j = i;
                         i--;
+                    } else {
+                        for (i = 0; actualRow -> character[i] != '\0' && actualRow -> character[i] != '\n'; i++) {
+                            printf("%c", actualRow -> character[i]);
+                        }
                     }
                 }
 
