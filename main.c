@@ -67,10 +67,11 @@ int main()
                 printf("\n---------------------------------------------------------------");
                 searchPattern(textEditor, commandLineInput);
                 flagInsertMode = 0;
-                printf("\n---------------------------------------------------------------");
+                printf("\n---------------------------------------------------------------\n");
                 break;
             case 5: // alterar %x %y %
                 changeOcorrences(textEditor->currentRow, commandLineInput);
+                flagInsertMode = 0;
                 break;
             case 6: // ultimo (to test)
                 getUltimoID(textEditor);
@@ -80,7 +81,7 @@ int main()
                 printf("\n---------------------------------------------------------------");
                 printLines(textEditor, commandLineInput);
                 flagInsertMode = 0;
-                printf("\n---------------------------------------------------------------");
+                printf("\n---------------------------------------------------------------\n");
                 break;
             case 8: // fim
                 flagRunning = 0;
@@ -88,13 +89,13 @@ int main()
                 break;
             default:
                 // TO-DO
+                flagInsertMode = 0;
                 break;
             }
-            printf("\n");
         }
         else
         {
-            printf("\nPlease Enter a command");
+            printf("\nERRO: Comandos devem começar com $");
         }
     }
 }
@@ -204,7 +205,7 @@ void addNewLine(List *textEditor, char *textLine)
     }
     else
     {
-        printf("ERROR: Linha com a quantidade máxima de caracteres atingida");
+        printf("\nERROR: Linha com a quantidade máxima de caracteres atingida\n");
     }
 }
 
@@ -363,7 +364,7 @@ void changeCurrentLine(List *textEditor, char *command)
 
     if (stringSize(command) < 8)
     {
-        printf("ERRO: PARAMETROS INSUFICIENTES");
+        printf("\nERRO: PARAMETROS INSUFICIENTES\n");
     }
     else
     {
@@ -393,7 +394,7 @@ void changeCurrentLine(List *textEditor, char *command)
             {
                 if (currentLine == lineRefered)
                 {
-                    printf("LINHA JÁ É A ACTUAL");
+                    printf("\nAVISO: A LINHA ACTUAL JÁ ESTA SELECIONADA\n");
                 }
                 else
                 {
@@ -449,7 +450,7 @@ void getUltimoID(List *textEditor)
     }
     else
     {
-        printf("\nTextEditor Vazio\n");
+        printf("\nEditor de Texto Vazio\n");
     }
 }
 
@@ -552,11 +553,11 @@ void printLines(List *textEditor, char *command)
     {
         if (containsWithStartIndex(command, ",", 0) == -1)
         {
-            printf("\nERRO: Falta virgula");
+            printf("\nERRO: Falta virgula\n");
         }
         else
         {
-            printf("\nERRO: QUANT PARAMETROS NÃO VALIDOS");
+            printf("\nERRO: QUANTIDADE DE PARAMETROS INSUFICIENTES\n");
         }
     }
     else
@@ -570,7 +571,7 @@ void printLines(List *textEditor, char *command)
         {
             if (printStart > textEditor->quantRows || printEnd > textEditor->quantRows)
             {
-                printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d", textEditor->quantRows);
+                printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d\n", textEditor->quantRows);
             }
             else
             {
@@ -608,19 +609,19 @@ void printLines(List *textEditor, char *command)
             switch (returnResult)
             {
             case -1:
-                printf("\nERRO: não existe a virgula no comando");
+                printf("\nERRO: não existe a virgula no comando\n");
                 break;
             case -2:
-                printf("\nERRO: não tem espaço no comando e deve existir");
+                printf("\nERRO: não tem espaço no comando e deve existir\n");
                 break;
             case -3:
-                printf("\nERRO: Linha não válida, linha não maior que 0");
+                printf("\nERRO: Linha não válida, linha não maior que 0\n");
                 break;
             case -4:
-                printf("\nERRO: Referência da linha de ínicio maior que a final");
+                printf("\nERRO: Referência da linha de ínicio maior que a final\n");
                 break;
             case -5:
-                printf("\nERRO: Primeiro parametro não passado");
+                printf("\nERRO: Primeiro parametro não passado\n");
                 break;
             default:
                 break;
@@ -633,7 +634,7 @@ void removeRows(List *textEditor, char *command)
 {
     if (stringSize(command) < 13)
     {
-        printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+        printf("\nERRO: QUANTIDADE DE PARAMETROS INSUFICIENTES\n");
     }
     else
     {
@@ -646,7 +647,7 @@ void removeRows(List *textEditor, char *command)
         {
             if (printStart > textEditor->quantRows || printEnd > textEditor->quantRows)
             {
-                printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d", textEditor->quantRows);
+                printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d\n", textEditor->quantRows);
             }
             else
             {
@@ -726,19 +727,19 @@ void removeRows(List *textEditor, char *command)
             switch (returnResult)
             {
             case -1:
-                printf("\nERRO: não existe a virgula no comando");
+                printf("\nERRO: não existe a virgula no comando\n");
                 break;
             case -2:
-                printf("\nERRO: não tem espaço no comando e deve existir");
+                printf("\nERRO: não tem espaço no comando e deve existir\n");
                 break;
             case -3:
-                printf("\nERRO: Linha não válida, linha não maior que 0");
+                printf("\nERRO: Linha não válida, linha não maior que 0\n");
                 break;
             case -4:
-                printf("\nERRO: Referência da linha de ínicio maior que a final");
+                printf("\nERRO: Referência da linha de ínicio maior que a final\n");
                 break;
             case -5:
-                printf("\nERRO: Primeiro parametro não passado");
+                printf("\nERRO: Primeiro parametro não passado\n");
                 break;
             default:
                 break;
@@ -819,7 +820,7 @@ void searchPattern(List *textEditor, char *command)
 {
     if (stringSize(command) < 13)
     {
-        printf("ERRO: QUANT PARAMETROS NÃO VALIDOS");
+        printf("\nERRO: QUANTIDADE DE PARAMETROS INVÁLIDOS\n");
     }
     else
     {
@@ -895,7 +896,7 @@ void changeOcorrences(Row *actualRow, char *command)
 {
     if (stringSize(command) < 13)
     {
-        printf("ERRO: FALTA PARAMETROS PARA O COMANDO");
+        printf("\nERRO: FALTA PARAMETROS PARA O COMANDO\n");
     }
     else
     {
@@ -911,7 +912,7 @@ void changeOcorrences(Row *actualRow, char *command)
             int secondDelimiterOcorrenceIndex = containsWithStartIndex(command, delimiter, firstDelimiterOcorrenceIndex + 1);
             int lastDelimiterOcorrenceIndex = stringSize(command) - 2;
 
-            printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
+            //printf("first: %d - Second: %d - Last: %d\n", firstDelimiterOcorrenceIndex, secondDelimiterOcorrenceIndex, lastDelimiterOcorrenceIndex);
 
             if (firstDelimiterOcorrenceIndex != -1 && secondDelimiterOcorrenceIndex != -1 && lastDelimiterOcorrenceIndex != -1)
             {
@@ -922,7 +923,7 @@ void changeOcorrences(Row *actualRow, char *command)
                 }
                 oldText[k] = '\0';
                 int oldTextSize = stringSize(oldText);
-                printf("\nOld Text: %s Size: %d", oldText, oldTextSize);
+                //printf("\nOld Text: %s Size: %d", oldText, oldTextSize);
 
                 for (k = 0, i = secondDelimiterOcorrenceIndex + 1; i < lastDelimiterOcorrenceIndex; i++)
                 {
@@ -932,7 +933,7 @@ void changeOcorrences(Row *actualRow, char *command)
                 newText[k] = '\0';
 
                 int newTextSize = stringSize(newText);
-                printf("\nNew Text: %s Size: %d", newText, newTextSize);
+                //printf("\nNew Text: %s Size: %d", newText, newTextSize);
 
                 k = 0;
                 i = 0;
@@ -974,8 +975,8 @@ void changeOcorrences(Row *actualRow, char *command)
                     }
                     actualRow -> character[k] = '\0';
 
-                    printf("\nText: %s Size: %d", text, stringSize(text));
-                    printf("\nOld Text: %s Size: %d", actualRow -> character, stringSize(actualRow -> character));
+                    //printf("\nText: %s Size: %d", text, stringSize(text));
+                    //printf("\nOld Text: %s Size: %d", actualRow -> character, stringSize(actualRow -> character));
                     h = 0;
                     i = 0;
                     k = 0;
@@ -985,12 +986,12 @@ void changeOcorrences(Row *actualRow, char *command)
             }
             else
             {
-                printf("\nERRO: PARAMETROS ENVIADOS INSUFICIENTES");
+                printf("\nERRO: PARAMETROS ENVIADOS INSUFICIENTES\n");
             }
         }
         else
         {
-            printf("ERROR: NÃO EXISTE LINHA CORRENTE VÁLIDA");
+            printf("\nERROR: NÃO EXISTE LINHA CORRENTE VÁLIDA\n");
         }
     }
 }
