@@ -264,38 +264,35 @@ int checkCommand(int startIndexOfCommand, char *textLine)
     {
         return 1;
     }
-    else if (equalsToCommandReaded(command, "remover\0") != 0)
+    if (equalsToCommandReaded(command, "remover\0") != 0)
     {
         return 2;
     }
-    else if (equalsToCommandReaded(command, "linha\0") != 0)
+    if (equalsToCommandReaded(command, "linha\0") != 0)
     {
         return 3;
     }
-    else if (equalsToCommandReaded(command, "localizar\0") != 0)
+    if (equalsToCommandReaded(command, "localizar\0") != 0)
     {
         return 4;
     }
-    else if (equalsToCommandReaded(command, "alterar\0") != 0)
+    if (equalsToCommandReaded(command, "alterar\0") != 0)
     {
         return 5;
     }
-    else if (equalsToCommandReaded(command, "ultimo\0") != 0)
+    if (equalsToCommandReaded(command, "ultimo\0") != 0)
     {
         return 6;
     }
-    else if (equalsToCommandReaded(command, "imprimir\0") != 0)
+    if (equalsToCommandReaded(command, "imprimir\0") != 0)
     {
         return 7;
     }
-    else if (equalsToCommandReaded(command, "fim\0") != 0)
+    if (equalsToCommandReaded(command, "fim\0") != 0)
     {
         return 8;
     }
-    else
-    {
-        return -1;
-    }
+    return -1;
 }
 
 void takeCommand(int startIndexOfCommand, char *textLine, char *command)
@@ -995,3 +992,9 @@ void changeOcorrences(Row *actualRow, char *command)
         }
     }
 }
+
+
+
+
+
+//ola ;)
