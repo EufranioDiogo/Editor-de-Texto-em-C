@@ -18,21 +18,18 @@ int isComand(char *textLine)
     int i = 0;
     int dollarSignalFound = 0;
 
+    //printf("\nString: %s\n", textLine);
+
     while (*(textLine + i) != '\0')
     {
         if (*(textLine + i) == '$')
         {
-            dollarSignalFound = 1;
+            return i;
             break;
         }
         i++;
     }
-
-    if (dollarSignalFound == 0)
-    {
-        return -1;
-    }
-    return i;
+    return -1;
 }
 
 void addNewLine(List *textEditor, char *textLine)
@@ -48,6 +45,8 @@ void addNewLine(List *textEditor, char *textLine)
             textEditor->firstRow->idLine = 1;
             textEditor->currentLine = 1;
             textEditor->quantRows = 1;
+
+            //printf("\nText Line: %d\n", textEditor -> quantRows);
 
             textEditor->lastRow = textEditor->firstRow;
             textEditor->currentRow = textEditor->lastRow;
@@ -749,40 +748,49 @@ void searchPattern(List *textEditor, char *command)
             int j = 0;
             int searchElementSize = stringSize(searchElement);
             printf("\n");
+            k = 0;
 
-            while (actualRow != NULL)
+            while (k < textEditor->quantRows)
             {
                 if (actualRow->flagCurrentLine == 1)
                 {
                     printf("\n→ ");
                 }
                 printf("%d ", actualRow->idLine);
-                while (i != -1)
-                {
-                    i = containsWithStartIndex(actualRow->character, searchElement, i);
 
-                    if (i != -1)
+                i = containsWithStartIndex(actualRow->character, searchElement, 0);
+
+                if (i == -1)
+                {
+                    for (; actualRow -> character[j] != '\0' && actualRow -> character[j] != '\n'; j++) {
+                        printf("%c", actualRow -> character[j]);
+                    }
+                }
+                else
+                {
+                    while (i != -1)
                     {
-                        for (; j < i; j++)
+                        int startIndex = i;
+                        int endIndex = i + searchElementSize;
+
+                        for (; j < startIndex; j++)
                         {
-                            if (actualRow->character[j] != '\n')
-                            {
-                                printf("%c", actualRow->character[j]);
+                            printf("%c", actualRow->character[j]);
+                        }
+
+                        for (j = startIndex; j < endIndex; j++)
+                        {
+                            printf("\033[32;1m%c\033[0m", actualRow->character[j]);
+                        }
+                        j = endIndex;
+                        i = endIndex;
+
+                        i = containsWithStartIndex(actualRow->character, searchElement, i);
+
+                        if (i == -1) {
+                            for (; actualRow -> character[j] != '\0' && actualRow -> character[j] != '\n'; j++) {
+                                printf("%c", actualRow -> character[j]);
                             }
-                        }
-                        
-                        for (; searchElementSize > 0; i++, searchElementSize--)
-                        {
-                            //printf(STYLE_UNDERLINE);
-                            printf("\033[32;1m%c\033[0m", actualRow->character[i]);
-                            //printf(STYLE_NO_UNDERLINE);
-                        }
-                        searchElementSize = stringSize(searchElement);
-                        j = i;
-                        i--;
-                    } else {
-                        for (i = 0; actualRow -> character[i] != '\0' && actualRow -> character[i] != '\n'; i++) {
-                            printf("%c", actualRow -> character[i]);
                         }
                     }
                 }
@@ -790,9 +798,9 @@ void searchPattern(List *textEditor, char *command)
                 actualRow = actualRow->nextRow;
                 i = 0;
                 j = 0;
+                k++;
                 printf("\n");
             }
-            // \033[1m ok \033[37m
         }
     }
 }
@@ -808,6 +816,12 @@ void changeOcorrences(Row *actualRow, char *command)
         if (actualRow != 0)
         {
             char delimiter[2] = {command[stringSize(command) - 2], '\0'};
+
+            if (delimiter[0] != '#' && delimiter[0] != '$' && delimiter[0] != '%')
+            {
+                printf("\nERRO: DELIMITADORES INCONSCISTENTE\n");
+                return;
+            }
             int i;
             int k = 0;
             char oldText[80];
@@ -867,25 +881,27 @@ void changeOcorrences(Row *actualRow, char *command)
 
                     i = indexToReplace + oldTextSize;
 
-                    for (; i < mainStringSize; i++) {
-                        text[k] = actualRow -> character[i];
+                    for (; i < mainStringSize; i++)
+                    {
+                        text[k] = actualRow->character[i];
                         k++;
                     }
 
                     text[k] = '\0';
 
                     auxStringSize = stringSize(text);
-                    for (k = 0; k < auxStringSize; k++) {
-                        actualRow -> character[k] = text[k];
+                    for (k = 0; k < auxStringSize; k++)
+                    {
+                        actualRow->character[k] = text[k];
                     }
-                    actualRow -> character[k] = '\0';
+                    actualRow->character[k] = '\0';
 
                     //printf("\nText: %s Size: %d", text, stringSize(text));
                     //printf("\nOld Text: %s Size: %d", actualRow -> character, stringSize(actualRow -> character));
                     h = 0;
                     i = 0;
                     k = 0;
-                    mainStringSize = stringSize(actualRow -> character);
+                    mainStringSize = stringSize(actualRow->character);
                     indexToReplace = containsWithStartIndex(actualRow->character, oldText, indexToReplace + newTextSize);
                 }
             }
@@ -900,9 +916,5 @@ void changeOcorrences(Row *actualRow, char *command)
         }
     }
 }
-
-
-
-
 
 //ola ;)

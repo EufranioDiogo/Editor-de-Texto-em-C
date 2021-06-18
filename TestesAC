@@ -1,0 +1,45 @@
+$inserir
+algumas pessoass
+algum tempo
+mas você não pode emganar
+todas as pessoas
+todo o tempo.
+
+Abraham Lincoln
+$linha 1
+$imprimir 1
+$imprimir 1,1
+$alterar %ss%%
+$imprimir 1, 1
+$alterar %o%sso
+$alterar %o%sso%
+$imprimir 1,1
+alterar %0a%oas%
+$alterar %oa%oas%
+$imprimir 1,1
+$linha 1
+$alterar %algo%algem
+$imprimir 1,1
+$insere (Erro command not valid)
+$inserir
+voce pode enganar
+algumas pessoas
+todo tempo e
+todo o tempo e
+voce pode enganar
+$ultimo
+$imprimir 1, 11
+$linha 6
+$alterar %algumas%todas as %
+$imprimir 6, 6
+$linha 8
+$%alterar %em%en% (Erro command not valid)
+$imprimir 8,8
+$linha 9
+$Alterar %os%as (Command not valid)
+$imprimir 9,9
+$remover 3,3
+$imprimir 1,11
+$localizar %tod (Loop infinito)
+$imprimir 1, 10
+$fim

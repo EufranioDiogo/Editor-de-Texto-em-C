@@ -21,8 +21,11 @@ int main()
 
         int isCommand = isComand(commandLineInput);
 
+        //printf("\nCommand: %d", isCommand);
+
         if (isCommand == -1 && flagInsertMode == 1)
         {
+            //printf("\nQuant Rows: %d\n", textEditor -> quantRows);
             addNewLine(textEditor, commandLineInput);
         }
         else if (isCommand != -1)
@@ -67,6 +70,9 @@ int main()
                 flagRunning = 0;
                 flagInsertMode = 0;
                 break;
+            case -1:
+                printf("\nERRO: COMANDO NÃO VÁLIDO\n");
+                break;
             default:
                 // TO-DO
                 flagInsertMode = 0;
@@ -75,7 +81,7 @@ int main()
         }
         else
         {
-            printf("\nERRO: Comandos devem começar com $");
+            printf("\nERRO: Comandos devem começar com $\n");
         }
     }
 }
