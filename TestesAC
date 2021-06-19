@@ -4,14 +4,15 @@ algum tempo
 mas você não pode emganar
 todas as pessoas
 todo o tempo.
-
 Abraham Lincoln
+
+
 $linha 1
 $imprimir 1
 $imprimir 1,1
 $alterar %ss%%
 $imprimir 1, 1
-$alterar %o%sso
+$alterar %o%sso (Delimitador(Done))
 $alterar %o%sso%
 $imprimir 1,1
 alterar %0a%oas%
@@ -20,7 +21,7 @@ $imprimir 1,1
 $linha 1
 $alterar %algo%algem
 $imprimir 1,1
-$insere (Erro command not valid)
+$insere (Erro command not valid(Done))
 $inserir
 voce pode enganar
 algumas pessoas
@@ -43,3 +44,4 @@ $imprimir 1,11
 $localizar %tod (Loop infinito)
 $imprimir 1, 10
 $fim
+

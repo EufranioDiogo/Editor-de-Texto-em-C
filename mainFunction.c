@@ -344,7 +344,7 @@ void getUltimoID(List *textEditor)
 {
     if (textEditor->lastRow != NULL)
     {
-        printf("\n%d\n", textEditor->lastRow->idLine);
+        printf("\n%d\n", textEditor->quantRows);
     }
     else
     {
