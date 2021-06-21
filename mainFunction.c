@@ -547,6 +547,10 @@ void removeRows(List *textEditor, char *command)
             {
                 printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d\n", textEditor->quantRows);
             }
+            else if (printStart > printEnd)
+            {
+                printf("\nERRO: Linha de ínicio deve ser menor com relação a linha de termino\nExemplo: $remover 1, 2\n");
+            }
             else
             {
                 Row *actualRow = textEditor->firstRow;
@@ -588,12 +592,20 @@ void removeRows(List *textEditor, char *command)
                         }
                         else
                         {
-                            actualRow->flagCurrentLine = 0;
+                            //actualRow->flagCurrentLine = 0;
                             actualRow->nextRow->previousRow = actualRow->previousRow;
                             actualRow->previousRow->nextRow = actualRow->nextRow;
 
                             updateRowsIDs(actualRow->previousRow);
                         }
+                    }
+
+                    if (actualRow -> flagCurrentLine) {
+                        textEditor -> currentRow = actualRow -> previousRow;
+                        actualRow -> flagCurrentLine = 0;
+                        if (textEditor -> currentRow != NULL) {
+                            textEditor -> currentRow -> flagCurrentLine = 1;
+                        }                      
                     }
 
                     trashRow = actualRow;
@@ -602,21 +614,6 @@ void removeRows(List *textEditor, char *command)
                     textEditor->quantRows -= 1;
                     free(trashRow);
                     printStart++;
-                }
-
-                if (actualRow != NULL)
-                {
-                    if (actualRow->previousRow != NULL)
-                    {
-                        textEditor->currentRow = actualRow->previousRow;
-                        textEditor->currentRow->flagCurrentLine = 1;
-                    }
-                    else if (actualRow->idLine == textEditor->firstRow->idLine)
-                    {
-                        textEditor->currentRow = actualRow;
-                        textEditor->currentRow->flagCurrentLine = 1;
-                        textEditor->lastRow = actualRow;
-                    }
                 }
             }
         }
