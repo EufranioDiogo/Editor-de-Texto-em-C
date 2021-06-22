@@ -752,7 +752,7 @@ void searchPattern(List *textEditor, char *command)
             {
                 if (actualRow->flagCurrentLine == 1)
                 {
-                    printf("\n→ ");
+                    printf("→ ");
                 }
                 printf("%d ", actualRow->idLine);
 
