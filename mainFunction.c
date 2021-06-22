@@ -471,34 +471,23 @@ void printLines(List *textEditor, char *command)
             {
                 printf("\nERRO: Linhas fora do número actual de linhas no editor de texto: %d\n", textEditor->quantRows);
             }
+            else if (printStart > printEnd)
+            {
+                printf("\nERRO: Linha de ínicio deve ser menor com relação a linha de termino\nExemplo: $remover 1, 2\n");
+            }
             else
             {
-                if (printStart == textEditor->currentRow->idLine)
-                {
-                    Row *actualRow = textEditor->currentRow;
+                Row *actualRow = textEditor->firstRow;
 
-                    while (printStart <= printEnd)
-                    {
-                        printRow(actualRow);
-                        actualRow = actualRow->nextRow;
-                        printStart++;
-                    }
+                while (actualRow -> idLine != printStart) {
+                    actualRow = actualRow -> nextRow;
                 }
-                else
+
+                while (printStart <= printEnd)
                 {
-                    Row *actualRow = textEditor->firstRow;
-
-                    while (actualRow != NULL && actualRow->idLine != printStart)
-                    {
-                        actualRow = actualRow->nextRow;
-                    }
-
-                    while (printStart <= printEnd)
-                    {
-                        printRow(actualRow);
-                        actualRow = actualRow->nextRow;
-                        printStart++;
-                    }
+                    printRow(actualRow);
+                    actualRow = actualRow->nextRow;
+                    printStart++;
                 }
             }
         }
@@ -566,54 +555,66 @@ void removeRows(List *textEditor, char *command)
                     actualRow = actualRow->nextRow;
                 }
 
+                int previousLineOfTheStartLineOfDeletion = printStart - 1;
+
+                printf("\nPreviousLine: %d\n", previousLineOfTheStartLineOfDeletion);
+                if (previousLineOfTheStartLineOfDeletion == 0) {
+                    textEditor -> firstRow -> flagCurrentLine = 0;
+                    textEditor -> currentLine = 0;
+                }
+
+                textEditor -> currentRow = NULL;
+
                 while (printStart <= printEnd)
                 {
-                    if (actualRow->idLine == textEditor->firstRow->idLine)
-                    {
-                        textEditor->firstRow = textEditor->firstRow->nextRow;
-                        if (textEditor->firstRow != NULL)
-                        {
-                            textEditor->firstRow->previousRow = NULL;
-                            textEditor->firstRow->idLine = 1;
-                            updateRowsIDs(textEditor->firstRow);
-                        }
-                        else
-                        {
-                            textEditor->lastRow = NULL;
-                            textEditor->currentRow = NULL;
-                        }
-                    }
-                    else
-                    {
-                        if (actualRow->nextRow == NULL)
-                        {
-                            textEditor->lastRow = actualRow->previousRow;
-                            textEditor->lastRow->nextRow = NULL;
-                        }
-                        else
-                        {
-                            //actualRow->flagCurrentLine = 0;
-                            actualRow->nextRow->previousRow = actualRow->previousRow;
-                            actualRow->previousRow->nextRow = actualRow->nextRow;
+                    actualRow -> flagCurrentLine = 0;
 
-                            updateRowsIDs(actualRow->previousRow);
+                    if (previousLineOfTheStartLineOfDeletion == 0) {
+                        textEditor -> firstRow = textEditor -> firstRow -> nextRow;
+                        
+                        if (textEditor -> firstRow != NULL) {
+                            textEditor -> firstRow -> previousRow = NULL;
+                            textEditor -> firstRow -> idLine = 1;
+                            updateRowsIDs(textEditor -> firstRow);
+                        } else {
+                            textEditor -> lastRow = NULL;
                         }
+                    } else {
+                        actualRow -> previousRow -> nextRow = actualRow -> nextRow;
+
+                        if (actualRow -> nextRow == NULL) {
+                            textEditor -> lastRow = actualRow -> previousRow;
+                        } else {
+                            actualRow -> nextRow -> previousRow = actualRow -> previousRow;
+                        }
+                        updateRowsIDs(actualRow -> previousRow);
                     }
 
-                    if (actualRow -> flagCurrentLine) {
-                        textEditor -> currentRow = actualRow -> previousRow;
-                        actualRow -> flagCurrentLine = 0;
-                        if (textEditor -> currentRow != NULL) {
-                            textEditor -> currentRow -> flagCurrentLine = 1;
-                        }                      
+                    if (actualRow != NULL) {
+                        trashRow = actualRow;
+                        actualRow = actualRow->nextRow;
+                        
+                        free(trashRow);
                     }
-
-                    trashRow = actualRow;
-                    actualRow = actualRow->nextRow;
 
                     textEditor->quantRows -= 1;
-                    free(trashRow);
                     printStart++;
+                }
+
+                printf("\nFirst Line: %s", textEditor -> firstRow -> character);
+
+                if (previousLineOfTheStartLineOfDeletion == 0) {
+                    textEditor -> currentLine = 0;
+                    textEditor -> currentRow = NULL;
+                } else {
+                    actualRow = textEditor -> firstRow;
+
+                    while (actualRow != NULL && actualRow -> idLine < previousLineOfTheStartLineOfDeletion) {
+                        actualRow = actualRow -> nextRow;
+                    }
+                    actualRow -> flagCurrentLine = 1;
+                    textEditor -> currentRow = actualRow;
+                    textEditor -> currentLine = previousLineOfTheStartLineOfDeletion;
                 }
             }
         }
