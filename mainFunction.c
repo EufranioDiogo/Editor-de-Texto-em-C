@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "tda.h"
 
-void error(int errorCode) {
+void error(int errorCode)
+{
     char *errorMessages[] = {
         "ERRO: QUANTIDADE DE PARAMETROS INSUFICIENTES",
         "ERRO: FALTA VIRGULA",
@@ -22,21 +23,19 @@ void error(int errorCode) {
         "ERRO: LINHA COM A QUANTIDADE MÁXIMA DE CARACTERES ATINGIDA",
         "ERRO: PARAMETROS INSUFICIENTES",
         "ERRO: LINHA NÃO EXISTE",
-        "ERRO: LINHAS FORA DO FORA DO NÚMERO ACTUAL DE LINHAS NO EDITOR DE TEXTO:"
-    };
+        "ERRO: LINHAS FORA DO FORA DO NÚMERO ACTUAL DE LINHAS NO EDITOR DE TEXTO:"};
 
     printf("\n%s\n", errorMessages[errorCode]);
 }
 
-void warning(int warningCode) {
+void warning(int warningCode)
+{
     char *warningsMessages[] = {
         "AVISO: A LINHA ACTUAL JÁ ESTA SELECIONADA",
-        "AVISO: EDITOR DE TEXTO VAZIO"
-    };
+        "AVISO: EDITOR DE TEXTO VAZIO"};
 
     printf("\n%s\n", warningsMessages[warningCode]);
 }
-
 
 void initializeTextEditor(List *textEditor)
 {
@@ -81,7 +80,6 @@ void addNewLine(List *textEditor, char *textLine)
             textEditor->firstRow->idLine = 1;
             textEditor->currentLine = 1;
             textEditor->quantRows = 1;
-
 
             textEditor->lastRow = textEditor->firstRow;
             textEditor->currentRow = textEditor->lastRow;
@@ -429,7 +427,6 @@ int containsWithStartIndex(char *string, char *subString, int index)
     int mainStringSize = stringSize(string);
     int subStringSize = stringSize(subString);
 
-
     if (contains(string, "\n\0") != -1)
     {
         mainStringSize--;
@@ -439,7 +436,6 @@ int containsWithStartIndex(char *string, char *subString, int index)
     {
         subStringSize--;
     }
-
 
     for (int i = index; i + subStringSize <= mainStringSize; i++)
     {
@@ -511,8 +507,9 @@ void printLines(List *textEditor, char *command)
             {
                 Row *actualRow = textEditor->firstRow;
 
-                while (actualRow -> idLine != printStart) {
-                    actualRow = actualRow -> nextRow;
+                while (actualRow->idLine != printStart)
+                {
+                    actualRow = actualRow->nextRow;
                 }
 
                 while (printStart <= printEnd)
@@ -588,43 +585,55 @@ void removeRows(List *textEditor, char *command)
                 }
 
                 int previousLineOfTheStartLineOfDeletion = printStart - 1;
-        
-                if (previousLineOfTheStartLineOfDeletion == 0) {
-                    textEditor -> firstRow -> flagCurrentLine = 0;
-                    textEditor -> currentLine = 0;
+
+                if (previousLineOfTheStartLineOfDeletion == 0)
+                {
+                    textEditor->firstRow->flagCurrentLine = 0;
+                    textEditor->currentLine = 0;
                 }
 
-                textEditor -> currentRow = NULL;
+                textEditor->currentRow = NULL;
 
                 while (printStart <= printEnd)
                 {
-                    actualRow -> flagCurrentLine = 0;
+                    actualRow->flagCurrentLine = 0;
 
-                    if (previousLineOfTheStartLineOfDeletion == 0) {
-                        textEditor -> firstRow = textEditor -> firstRow -> nextRow;
-                        
-                        if (textEditor -> firstRow != NULL) {
-                            textEditor -> firstRow -> previousRow = NULL;
-                            textEditor -> firstRow -> idLine = 1;
-                            updateRowsIDs(textEditor -> firstRow);
-                        } else {
-                            textEditor -> lastRow = NULL;
-                        }
-                    } else {
-                        actualRow -> previousRow -> nextRow = actualRow -> nextRow;
+                    if (previousLineOfTheStartLineOfDeletion == 0)
+                    {
+                        textEditor->firstRow = textEditor->firstRow->nextRow;
 
-                        if (actualRow -> nextRow == NULL) {
-                            textEditor -> lastRow = actualRow -> previousRow;
-                        } else {
-                            actualRow -> nextRow -> previousRow = actualRow -> previousRow;
+                        if (textEditor->firstRow != NULL)
+                        {
+                            textEditor->firstRow->previousRow = NULL;
+                            textEditor->firstRow->idLine = 1;
+                            updateRowsIDs(textEditor->firstRow);
                         }
-                        updateRowsIDs(actualRow -> previousRow);
+                        else
+                        {
+                            textEditor->lastRow = NULL;
+                        }
+                    }
+                    else
+                    {
+                        actualRow->previousRow->nextRow = actualRow->nextRow;
+
+                        if (actualRow->nextRow == NULL)
+                        {
+                            textEditor->lastRow = actualRow->previousRow;
+                        }
+                        else
+                        {
+                            actualRow->nextRow->previousRow = actualRow->previousRow;
+                        }
+                        updateRowsIDs(actualRow->previousRow);
                     }
 
-                    if (actualRow != NULL) {
+                    if (actualRow != NULL)
+                    {
                         trashRow = actualRow;
                         actualRow = actualRow->nextRow;
-                        
+                        updateRowsIDs(actualRow->previousRow);
+
                         free(trashRow);
                     }
 
@@ -632,18 +641,22 @@ void removeRows(List *textEditor, char *command)
                     printStart++;
                 }
 
-                if (previousLineOfTheStartLineOfDeletion == 0) {
-                    textEditor -> currentLine = 0;
-                    textEditor -> currentRow = NULL;
-                } else {
-                    actualRow = textEditor -> firstRow;
+                if (previousLineOfTheStartLineOfDeletion == 0)
+                {
+                    textEditor->currentLine = 0;
+                    textEditor->currentRow = NULL;
+                }
+                else
+                {
+                    actualRow = textEditor->firstRow;
 
-                    while (actualRow != NULL && actualRow -> idLine < previousLineOfTheStartLineOfDeletion) {
-                        actualRow = actualRow -> nextRow;
+                    while (actualRow != NULL && actualRow->idLine < previousLineOfTheStartLineOfDeletion)
+                    {
+                        actualRow = actualRow->nextRow;
                     }
-                    actualRow -> flagCurrentLine = 1;
-                    textEditor -> currentRow = actualRow;
-                    textEditor -> currentLine = previousLineOfTheStartLineOfDeletion;
+                    actualRow->flagCurrentLine = 1;
+                    textEditor->currentRow = actualRow;
+                    textEditor->currentLine = previousLineOfTheStartLineOfDeletion;
                 }
             }
         }
@@ -670,8 +683,9 @@ void removeRows(List *textEditor, char *command)
                 break;
             }
         }
-        if (textEditor -> firstRow != NULL) {
-            updateRowsIDs(textEditor -> firstRow);
+        if (textEditor->firstRow != NULL)
+        {
+            updateRowsIDs(textEditor->firstRow);
         }
     }
 }
@@ -792,8 +806,9 @@ void searchPattern(List *textEditor, char *command)
 
                 if (i == -1)
                 {
-                    for (; actualRow -> character[j] != '\0' && actualRow -> character[j] != '\n'; j++) {
-                        printf("%c", actualRow -> character[j]);
+                    for (; actualRow->character[j] != '\0' && actualRow->character[j] != '\n'; j++)
+                    {
+                        printf("%c", actualRow->character[j]);
                     }
                 }
                 else
@@ -817,9 +832,11 @@ void searchPattern(List *textEditor, char *command)
 
                         i = containsWithStartIndex(actualRow->character, searchElement, i);
 
-                        if (i == -1) {
-                            for (; actualRow -> character[j] != '\0' && actualRow -> character[j] != '\n'; j++) {
-                                printf("%c", actualRow -> character[j]);
+                        if (i == -1)
+                        {
+                            for (; actualRow->character[j] != '\0' && actualRow->character[j] != '\n'; j++)
+                            {
+                                printf("%c", actualRow->character[j]);
                             }
                         }
                     }
