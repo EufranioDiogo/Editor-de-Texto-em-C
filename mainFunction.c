@@ -32,7 +32,9 @@ void warning(int warningCode)
 {
     char *warningsMessages[] = {
         "AVISO: A LINHA ACTUAL JÁ ESTA SELECIONADA",
-        "AVISO: EDITOR DE TEXTO VAZIO"};
+        "AVISO: EDITOR DE TEXTO VAZIO",
+        "AVISO: PALAVRA NÃO ENCONTRADA"
+        };
 
     printf("\n%s\n", warningsMessages[warningCode]);
 }
@@ -904,6 +906,11 @@ void changeOcorrences(Row *actualRow, char *command)
                 int mainStringSize = stringSize(actualRow->character);
                 int auxStringSize = 0;
                 indexToReplace = containsWithStartIndex(actualRow->character, oldText, indexToReplace);
+
+                if (indexToReplace == -1) {
+                    warning(2);
+                    return;
+                }
 
                 while (indexToReplace != -1)
                 {

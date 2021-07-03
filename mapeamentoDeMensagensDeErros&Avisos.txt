@@ -1,0 +1,89 @@
+// Error Messages
+0 - "ERRO: QUANTIDADE DE PARAMETROS INSUFICIENTES",
+1 - "ERRO: FALTA VIRGULA",
+2 - "ERRO: LINHA DE ÍNICIO DEVE SER MENOR COM RELAÇÃO A LINHA DE TERMINOU\nExemplo: $remover 1, 2",
+3 - "ERRO: NÃO EXISTE A VIRGULA NO COMANDO",
+4 - "ERRO: NÃO TEM ESPAÇO NO COMANDO E DEVE EXISTIR",
+5 - "ERRO: LINHA NÃO VÁLIDA, LINHA NÃO MAIOR QUE 0",
+6 - "ERRO: REFERÊNCIA DA LINHA DE ÍNICIO MAIOR QUE A FINAL",
+7 - "ERRO: PRIMEIRO PARAMETRO NÃO PASSADO",
+8 - "ERRO: QUANTIDADE DE PARAMETROS INSUFICIENTES",
+9 - "ERRO: PRIMEIRO PARAMETRO NÃO PASSADO",
+10 - "ERRO: QUANTIDADE DE PARAMETROS INVÁLIDOS",
+11 - "ERRO: FALTA PARAMETROS PARA O COMANDO",
+12 - "ERRO: DELIMITADORES INCONSCISTENTE",
+13 - "ERRO: PARAMETROS ENVIADOS INSUFICIENTES",
+14 - "ERRO: NÃO EXISTE LINHA CORRENTE VÁLIDA",
+15 - "ERRO: LINHA COM A QUANTIDADE MÁXIMA DE CARACTERES ATINGIDA",
+16 - "ERRO: PARAMETROS INSUFICIENTES",
+17 - "ERRO: LINHA NÃO EXISTE",
+18 - "ERRO: LINHAS FORA DO FORA DO NÚMERO ACTUAL DE LINHAS NO EDITOR DE TEXTO:"
+
+1 - "AVISO: A LINHA ACTUAL JÁ ESTA SELECIONADA",
+2 - "AVISO: EDITOR DE TEXTO VAZIO"
+
+// 144
+
+
+/*
+
+$inserir
+algumas pessoass
+algum tempo
+mas você não pode emganar
+todas as pessoas
+todo o tempo.
+Abraham Lincoln
+$linha 1
+$imprimir 1
+$imprimir 1,1
+$alterar %ss%%
+$imprimir 1, 1
+$alterar %o%sso
+$alterar %o%sso%
+$imprimir 1,1
+alterar %0a%oas%
+$alterar %oa%oas%
+$imprimir 1,1
+$linha 1
+$alterar %algo%algem
+$imprimir 1,1
+$insere
+$inserir
+voce pode enganar
+algumas pessoas
+todo tempo e
+todo o tempo e
+voce pode enganar
+$ultimo
+$imprimir 1, 11
+$linha 6
+$alterar %algumas%todas as %
+$imprimir 6, 6
+$linha 8
+$%alterar %em%en%
+$imprimir 8,8
+$linha 9
+$alterar %os%as
+$imprimir 9,9
+$remover 3,3
+$imprimir 1,11
+$localizar %tod
+$imprimir 1, 10
+$fim
+
+*/
+
+
+algumas pessoas
+voce pode enganar
+algumas pessoas
+todo tempo e
+todo o tempo e
+voce pode enganar
+algum tempo
+mas você não pode emganar
+todas as pessoas
+todo o tempo.
+Abraham Lincoln
+
